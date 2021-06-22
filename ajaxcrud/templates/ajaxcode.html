@@ -1,0 +1,91 @@
+<script>
+
+// for crating new records....
+$('.createbutton').click(function(){
+    console.log('button was clicked.....')
+var output='';
+// for updata...
+var ajid=$('#studentid').val();
+// //...........
+var ajname=$('#nameid').val();
+var ajroll=$('#rollid').val();
+var ajemail=$('#emailid').val();
+var ajpassword=$('#passwordid').val();
+var ajcsrftoken=$('input[name="csrfmiddlewaretoken"]').val();
+mydata={id:ajid,name:ajname,roll:ajroll,email:ajemail,password:ajpassword,csrfmiddlewaretoken:ajcsrftoken};
+$.ajax({url:"{% url 'createandshow' %}",method:'POST',data:mydata,success:function(data){
+    // console.log(data.status);
+    // console.log(data.alldata)
+    if (data.status=='save'){
+        // console.log('success')
+        var md=data.alldata;
+
+        $('form')[0].reset();
+        $('#studentid').val('')
+        for (i=0;i<md.length;i++){
+            output=output+'<tr><td>'+md[i].roll+'</td><td>'+md[i].id+'</td><td>'+md[i].name+'</td><td>'+md[i].email+'</td><td>'+md[i].password+'</td><td><input type="button" class="btn btn-sm btn-danger btn-delete" value="delete" st-data='+md[i].id+'><input type="button" class="btn btn-sm btn-info btn-update" value="update" st-data='+md[i].id+'></td>'
+            $('.tbodyclass').html(output);
+
+
+
+
+
+
+        }
+        
+    }
+}})
+})
+
+
+
+// for delete the exsting records..........
+$('.btn-delete').click(function(){
+    console.log('delete button was clicked....')
+    let k=$(this).attr('st-data')
+    // console.log(k);
+    let csrf=$('input[name="csrfmiddlewaretoken"]').val();
+    mythis=this;
+    mydata={id:k,csrfmiddlewaretoken:csrf};
+    $.ajax({data:mydata,method:'POST',url:"{% url 'deletedata' %}",success:function(data){
+        // console.log('data deleted....')
+        if (data.status==1){
+            $(mythis).closest('tr').fadeOut();
+            // console.log('delete complete')
+
+
+
+        }
+}})
+})
+
+
+
+// for updating the existing data.......
+$('.btn-update').click(function(){
+    console.log('update button was clicked.........')
+    let x=$(this).attr('st-data');
+    console.log(x);
+    let csrf=$('input[name="csrfmiddlewaretoken"]').val();
+    var mydata={id:x,csrfmiddlewaretoken:csrf};
+    $.ajax({data:mydata,method:'POST',url:"{% url 'updatedata' %}",success:function(data){
+        console.log('update working.......')
+        if (data.status==1){
+            console.log(data.studentdata);
+            var a=data.studentdata;
+            $('#studentid').val(a.id)
+            $('#rollid').val(a.roll)
+            $('#nameid').val(a.name)
+            $('#emailid').val(a.email)
+            $('#passwordid').val(a.password)
+
+            
+        }
+    }})
+})
+
+
+
+
+
+</script>
